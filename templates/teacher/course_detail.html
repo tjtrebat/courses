@@ -1,0 +1,53 @@
+{% extends "teacher/base.html" %}
+
+{% load teacher_extras %}
+
+{% block js %}
+    {% do_tabs tabs %}
+{% endblock %}
+
+{% block header %}
+	<ul class="grid_2">
+		<li class="grid_2 alpha omega">
+			<a href="{% url create_test course.id %}"><span class="ui-icon ui-icon-plusthick"></span>Add test</a>
+		</li>
+	</ul>
+{% endblock %}
+
+{% block content %}
+    <div id="tabs">
+        <ul>
+            <li><a href="#tabs-1">Current Tests</a></li>
+            <li><a href="#tabs-2">Sent Tests</a></li>
+        </ul>
+        <div id="tabs-1">
+            <ul>
+                {% for test in course.test_set.all %}
+                    {% if not test.is_sent %}
+                        <li><a href="{{ test.get_absolute_url }}">{{ test }}</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+        <div id="tabs-2">
+            <ul>
+                {% for test in course.test_set.all %}
+                    {% if test.is_sent %}
+                        <li><a href="{{ test.get_absolute_url }}">{{ test }}</a></li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}
+
+{% block footer %}
+    <ul class="grid_4">
+        <li class="grid_2 alpha">
+            <a class="ui-state-error" href="{% url delete_course course.id %}"><span class="ui-icon ui-icon-closethick"></span>Delete</a>
+        </li>
+        <li class="grid_2 omega">
+            <a href="{% url update_course course.id %}"><span class="ui-icon ui-icon-pencil"></span>Edit</a>
+        </li>
+    </ul>
+{% endblock %}

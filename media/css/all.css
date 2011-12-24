@@ -1,0 +1,14 @@
+.errorlist {
+    color:#FF0000;
+}
+
+.ui-icon {
+	position:relative;
+	top:4px;
+	right:5px;
+    float:left;
+}
+
+#sortable {
+    list-style:none;	
+}

@@ -1,0 +1,67 @@
+{% extends "teacher/base.html" %}
+
+{% block js %}
+    {% if not test.is_sent %}
+        {{ block.super }}
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $(document).ajaxSend(function(event, xhr, settings) {
+                    function safeMethod(method) {
+                        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+                    }
+                    if (!safeMethod(settings.type) && !settings.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", $.cookie('csrftoken'));
+                    }
+                });
+                $("#sortable").sortable({update: function(event, ui) {
+                    $.post("{% url sort_question course.id test.id %}", $("#sortable").sortable("serialize"))
+                            .error(function() { $("#sortable").sortable("cancel"); });
+                }, containment: 'parent'});
+                $("#sortable").disableSelection();
+            });
+        </script>
+	{% endif %}
+{% endblock %}
+
+{% block header %}
+    <ul class="grid_6">
+        <li class="grid_3 alpha">
+            <a href="{% url course_detail course.id %}"><span class="ui-icon ui-icon-arrowthick-1-w"></span>Back to Course</a>
+        </li>
+        <li class="grid_3 omega">
+            {% if not test.is_sent %}
+                <a href="{% url create_question course.id test.id %}"><span class="ui-icon ui-icon-plusthick"></span>Add question</a>
+            {% endif %}
+        </li>
+    </ul>
+{% endblock %}
+
+{% block content %}
+    {% if not test.is_sent %}
+		<ul id="sortable" class="grid_5">
+			{% for question in test.question_set.all %}
+				<li id="question_{{ question.id }}"><a href="{{ question.get_absolute_url }}"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>{{ question }}</a></li>
+			{% endfor %}
+		</ul>
+    {% else %}
+		<ul class="grid_5">
+			{% for question in test.question_set.all %}
+				<li><a href="{% url question_detail course.id test.id question.id %}">{{ question }}</a></li>
+			{% endfor %}
+		</ul>    
+    {% endif %}
+{% endblock %}
+
+{% block footer %}
+    <ul class="grid_6">
+        <li class="grid_2 alpha">
+            <a class="ui-state-error" href="{% url delete_test course.id test.id %}"><span class="ui-icon ui-icon-closethick"></span>Delete</a>
+        </li>
+        <li class="grid_2">
+            <a href="{% url update_test course.id test.id %}"><span class="ui-icon ui-icon-pencil"></span>Edit</a>
+        </li>
+        <li class="grid_2 omega">
+            <a href="{% url send_test course.id test.id %}"><span class="ui-icon ui-icon-mail-closed"></span>Send</a>
+        </li>
+    </ul>
+{% endblock %}

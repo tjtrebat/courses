@@ -1,0 +1,60 @@
+{% extends "teacher/base.html" %}
+
+{% block js %}
+    {% if question %}
+        {{ block.super }}
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $(document).ajaxSend(function(event, xhr, settings) {
+                    function safeMethod(method) {
+                        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+                    }
+                    if (!safeMethod(settings.type) && !settings.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", $.cookie('csrftoken'));
+                    }
+                });
+                $("#sortable").sortable({update: function(event, ui) {
+                    $.post("{% url sort_answer course.id test.id question.id %}", $("#sortable").sortable("serialize"))
+                            .error(function() { $("#sortable").sortable("cancel"); });
+                }, containment: 'parent'});
+                $("#sortable").disableSelection();
+            });
+        </script>
+    {% endif %}
+{% endblock %}
+
+{% block header %}
+    <ul class="grid_6">
+        <li class="grid_3 alpha"><a href="{% url course_detail course.id %}"><span class="ui-icon ui-icon-arrowthick-1-w"></span>Back to Course</a></li>
+        <li class="grid_3 omega"><a href="{{ test.get_absolute_url }}"><span class="ui-icon ui-icon-arrowthick-1-w"></span>Back to Test</a></li>
+    </ul>
+{% endblock %}
+
+{% block content %}
+    <form action="{% if question %}{{ question.get_absolute_url }}{% else %}{% url create_question course.id test.id %}{% endif %}" method="POST">
+        {{ form.as_p }}
+        {% csrf_token %}
+        <button type="submit">{% if question %}Update{% else %}Create{% endif %}</button>
+    </form>
+    {% if question %}
+        <p><a href="{% if question.question_type == 'multiple_choice' %}{% url create_multiplechoiceanswer course.id test.id question.id %}{% else %}{% url create_answer course.id test.id question.id %}{% endif %}"><span class="ui-icon ui-icon-plusthick"></span>Add answer</a></p>
+        {% if question.answer_set.all.count %}
+            <p class="underline">Answers:</p>
+            <ul id="sortable">
+				{% for answer in question.answer_set.all %}
+					<li id="answer_{{ answer.id }}"><a href="{% if question.question_type == 'multiple_choice' %}{% url update_multiplechoiceanswer course.id test.id question.id answer.id %}{% else %}{{ answer.get_absolute_url }}{% endif %}"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>{{ answer }}</a></li>
+				{% endfor %}
+            </ul>
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
+{% block footer %}
+    <ul class="grid_2">
+        <li class="grid_2 alpha omega">
+            {% if question %}
+                <a class="ui-state-error" href="{% url delete_question course.id test.id question.id %}"><span class="ui-icon ui-icon-closethick"></span>Delete</a>
+            {% endif %}
+        </li>
+    </ul>
+{% endblock %}

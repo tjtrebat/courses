@@ -1,0 +1,20 @@
+{% extends "teacher/base.html" %}
+
+{% block header %}
+	<ul class="grid_6">
+		<li class="grid_3 alpha">
+			<a href="{{ course.get_absolute_url }}"><span class="ui-icon ui-icon-arrowthick-1-w"></span>Back to Course</a>
+		</li>
+		<li class="grid_3 omega">
+			<a href="{% url create_student course.id %}"><span class="ui-icon ui-icon-plusthick"></span>Add Student</a>
+		</li>
+	</ul>
+{% endblock %}
+
+{% block content %}
+	<ul>
+		{% for student in students %}
+			<li><a href="{% url update_student course.id student.id %}">{{ student.get_full_name }}</a></li>
+		{% endfor %}
+	</ul>
+{% endblock %}

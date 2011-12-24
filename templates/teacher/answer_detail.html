@@ -1,0 +1,13 @@
+{% extends "teacher/base.html" %}
+
+{% block header %}
+    <ul class="grid_9">
+        <li class="grid_3 alpha"><a href="{% url course_detail course.id %}"><span class="ui-icon ui-icon-arrowthick-1-w"></span>Back to Course</a></li>
+        <li class="grid_3"><a href="{{ test.get_absolute_url }}"><span class="ui-icon ui-icon-arrowthick-1-w"></span>Back to Test</a></li>
+        <li class="grid_3 omega"><a href="{% url question_detail course.id test.id question.id %}"><span class="ui-icon ui-icon-arrowthick-1-w"></span>Back to Question</a></li>
+    </ul>
+{% endblock %}
+
+{% block content %}
+	<p>{{ answer }}</p>
+{% endblock %}
