@@ -1,9 +1,0 @@
-{% extends "teacher/base.html" %}
-
-{% block content %}
-    <form action="{% if student %}{{ student.get_profile.get_absolute_url }}{% else %}{% url create_student %}{% endif %}" method="POST">
-        {{ form.as_p }}
-        {% csrf_token %}
-        <button type="submit">{% if student %}Update{% else %}Create{% endif %}</button>
-    </form>
-{% endblock %}

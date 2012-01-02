@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login
 from django.http import HttpResponseRedirect
 from registration.forms import *
 
-def user_login(request, template='registration/login.html'):
+def user_login(request, template='login.html'):
     if request.method == "POST":
         form = LoginForm(request.POST)
         if form.is_valid():

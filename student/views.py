@@ -1,10 +1,10 @@
-#__author__ = 'Tom'
+__author__ = 'Tom'
 
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from teacher.models import Test, TakenTest
 
-def test_list(request, template='student/test_list.html'):
+def test_list(request, template='test_list.html'):
     tests = []
     taken_tests = []
     for course in request.user.get_profile().courses.all():

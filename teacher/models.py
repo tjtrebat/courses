@@ -1,4 +1,3 @@
-import datetime
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -13,7 +12,7 @@ class Course(models.Model):
     
     @models.permalink
     def get_absolute_url(self):
-        return ('update_course', (self.id,), {})     
+        return ('teacher:update_course', (self.id,), {})
      
     def __unicode__(self):
         return self.name
@@ -30,7 +29,7 @@ class Test(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('test_detail', (self.course.id, self.id,), {})
+        return ('teacher:test_detail', (self.course.id, self.id,), {})
 
     def __unicode__(self):
         return self.name
@@ -47,7 +46,7 @@ class Question(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('update_question', (self.test.course.id, self.test.id, self.id,), {})
+        return ('teacher:update_question', (self.test.course.id, self.test.id, self.id,), {})
 
     def __unicode__(self):
         return self.question
@@ -62,7 +61,7 @@ class Answer(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('update_answer', (self.question.test.course.id,
+        return ('teacher:update_answer', (self.question.test.course.id,
                                   self.question.test.id,
                                   self.question.id,
                                   self.id,), {})
@@ -75,7 +74,7 @@ class MultipleChoiceAnswer(Answer):
     
     @models.permalink
     def get_absolute_url(self):
-        return ('update_multiplechoiceanswer', (self.question.test.course.id,
+        return ('teacher:update_multiplechoiceanswer', (self.question.test.course.id,
                                                 self.question.test.id,
                                                 self.question.id,
                                                 self.id,), {})

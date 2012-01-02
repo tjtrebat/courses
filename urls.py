@@ -8,8 +8,8 @@ admin.autodiscover()
 urlpatterns = patterns('',
     # Example:
     (r'^', include('registration.urls')),
-    (r'^', include('teacher.urls')),
-    (r'^', include('student.urls')),
+    (r'^', include('teacher.urls', namespace="teacher", app_name="teacher")),
+    (r'^', include('student.urls', namespace="student", app_name="student")),
 
     # Uncomment the admin/doc line below to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
