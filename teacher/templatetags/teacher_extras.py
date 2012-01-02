@@ -9,8 +9,7 @@ class SortableNode(template.Node):
         self.viewname = viewname
     def render(self, context):
         t = template.loader.get_template('_sortable.html')
-        url = reverse(self.viewname, current_app='teacher')
-        return t.render(Context({'url': url}, autoescape=False))
+        return t.render(Context({'url': reverse(self.viewname)}, autoescape=False))
 
 @register.tag
 def do_sortable(parser, token):

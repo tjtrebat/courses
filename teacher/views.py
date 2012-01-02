@@ -35,8 +35,7 @@ def update_course(request, course_id, template='course_form.html'):
         form = CourseForm(request.POST, instance=course)
         if form.is_valid():
             form.save(request=request)
-            return HttpResponseRedirect(reverse('course_detail', args=[course.pk],
-                current_app='teacher'))
+            return HttpResponseRedirect(reverse('teacher:course_detail', args=[course.pk]))
     else:
         form = CourseForm(instance=course)
     return render_to_response(template, {'course': course,
@@ -60,6 +59,12 @@ def create_course(request, template='course_form.html'):
 @user_passes_test(lambda u: u.get_profile().is_teacher())
 def delete_course(request, course_id, template='course_confirm_delete.html'):
     course = get_object_or_404(request.user.course_set.all(), pk=course_id)
+    if request.method == 'POST':
+        course.delete()
+        msg = ugettext("The %(verbose_name)s was deleted.") %\
+              {"verbose_name": Course._meta.verbose_name}
+        messages.success(request, msg, fail_silently=True)
+        return HttpResponseRedirect(reverse("teacher:course_list"))
     return render_to_response(template, {'course': course},
         context_instance=RequestContext(request))
 
@@ -72,7 +77,7 @@ def update_student(request, student_id, template='student_form.html'):
         form = ChangeStudentForm(request.POST, instance=student)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect(reverse('course_list', current_app='teacher'))
+            return HttpResponseRedirect(reverse('teacher:course_list'))
     else:
         form = ChangeStudentForm(instance=student)  
     return render_to_response(template, {'student': student,
@@ -86,7 +91,7 @@ def create_student(request, template='student_form.html'):
         form = AddStudentForm(request.user, request.POST)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect(reverse('course_list', current_app='teacher'))
+            return HttpResponseRedirect(reverse('teacher:course_list'))
     else:
         form = AddStudentForm(request.user)    
     return render_to_response(template, {'form': form},
@@ -140,6 +145,12 @@ def delete_test(request, course_id, test_id, template='test_confirm_delete.html'
     test = get_object_or_404(Test.objects.select_related(), pk=test_id)
     course = test.course
     if request.user != course.teacher: raise Http404
+    if request.method == 'POST':
+        test.delete()
+        msg = ugettext("The %(verbose_name)s was deleted.") %\
+              {"verbose_name": Test._meta.verbose_name}
+        messages.success(request, msg, fail_silently=True)
+        return HttpResponseRedirect(reverse("teacher:course_detail", args=[course.pk]))
     return render_to_response(template, {'course': course,
                                          'test': test},
         context_instance=RequestContext(request))
@@ -218,6 +229,12 @@ def delete_question(request, course_id, test_id, question_id, template='question
     course = test.course
     if request.user != course.teacher or test.is_sent:
         raise Http404
+    if request.method == 'POST':
+        question.delete()
+        msg = ugettext("The %(verbose_name)s was deleted.") %\
+              {"verbose_name": Question._meta.verbose_name}
+        messages.success(request, msg, fail_silently=True)
+        return HttpResponseRedirect(reverse("teacher:test_detail", args=[course.pk, test.pk]))
     return render_to_response(template, {'course': course,
                                          'test': test},
         context_instance=RequestContext(request))
@@ -287,6 +304,12 @@ def delete_answer(request, course_id, test_id, question_id, answer_id, template=
     course = test.course
     if request.user != course.teacher or test.is_sent:
         raise Http404
+    if request.method == 'POST':
+        answer.delete()
+        msg = ugettext("The %(verbose_name)s was deleted.") %\
+              {"verbose_name": Answer._meta.verbose_name}
+        messages.success(request, msg, fail_silently=True)
+        return HttpResponseRedirect(reverse("teacher:question_detail", args=[course.pk, test.pk, question.pk]))
     return render_to_response(template, {'course': course,
                                          'test': test,
                                          'question': question},
@@ -363,6 +386,12 @@ def delete_multiplechoiceanswer(request, course_id, test_id, question_id, answer
     course = test.course
     if request.user != course.teacher or test.is_sent:
         raise Http404
+    if request.method == 'POST':
+        multiple_choice_answer.delete()
+        msg = ugettext("The %(verbose_name)s was deleted.") %\
+              {"verbose_name": Answer._meta.verbose_name}
+        messages.success(request, msg, fail_silently=True)
+        return HttpResponseRedirect(reverse("teacher:question_detail", args=[course.pk, test.pk, question.pk]))
     return render_to_response(template, {'course': course,
                                          'test': test,
                                          'question': question},
