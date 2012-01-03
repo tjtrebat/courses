@@ -4,11 +4,11 @@
 <head>
     <title>Test Administration</title>
     <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/960.css" />
+    <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/jquery-ui-1.8.16.custom.css" />
     <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/all.css" />
-    <link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}css/jquery-ui.css" />
     {% block css %}{% endblock %}
-    <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery-1.5.1.min.js"></script>
-    <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery-1.6.2.min.js"></script>
+    <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery-ui-1.8.16.custom.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function(){
             $("a, button").button();
@@ -21,16 +21,25 @@
         <ul class="grid_12">
             {% block navigation %}{% endblock %}
         </ul>
+        {% if messages %}
+            <ul id="messages" class="grid_12">
+                {% for message in messages %}
+                    <li class="grid_11">
+                        {% if message.level == 25 %}
+                            <div class="ui-widget">
+                                <div class="ui-state-highlight ui-corner-all">
+                                    <p><span class="ui-icon ui-icon-info"></span>
+                                        <strong>Hey!</strong> {{ message }}</p>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
         <div class="grid_7">
             {% block header %}{% endblock %}
         	<div class="grid_6 prefix_1">
-				{% if messages %}
-				<ul class="messages">
-					{% for message in messages %}
-					<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-					{% endfor %}
-				</ul>
-				{% endif %}
             	{% block content %}{% endblock %}
             </div>
             {% block footer %}{% endblock %}

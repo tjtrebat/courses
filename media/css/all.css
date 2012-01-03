@@ -9,6 +9,15 @@
     float:left;
 }
 
+.ui-state-highlight {
+    margin-top: 20px;
+    padding: 0 .7em;
+}
+
 #sortable {
     list-style:none;	
+}
+
+#messages {
+    margin-top: 0;
 }

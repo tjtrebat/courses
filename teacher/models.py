@@ -12,7 +12,7 @@ class Course(models.Model):
     
     @models.permalink
     def get_absolute_url(self):
-        return ('teacher:update_course', (self.id,), {})
+        return ('teacher:course_detail', (self.id,), {})
      
     def __unicode__(self):
         return self.name
@@ -29,14 +29,14 @@ class Test(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('teacher:test_detail', (self.course.id, self.id,), {})
+        return ('teacher:test_detail', (self.id,), {})
 
     def __unicode__(self):
         return self.name
 
 class Question(models.Model):
     question = models.TextField()
-    question_type = models.CharField(max_length=500, choices=(('multiple_choice', 'Multiple Choice'),
+    type = models.CharField(max_length=500, choices=(('multiple_choice', 'Multiple Choice'),
                                      ('essay', 'Essay'), ('fill_blank', 'Fill Blank')))
     test = models.ForeignKey('Test')
     ordering = models.IntegerField()
@@ -46,7 +46,7 @@ class Question(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('teacher:update_question', (self.test.course.id, self.test.id, self.id,), {})
+        return ('teacher:update_question', (self.id,), {})
 
     def __unicode__(self):
         return self.question
@@ -61,10 +61,7 @@ class Answer(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('teacher:update_answer', (self.question.test.course.id,
-                                  self.question.test.id,
-                                  self.question.id,
-                                  self.id,), {})
+        return ('teacher:update_answer', (self.id,), {})
 
     def __unicode__(self):
         return self.answer
@@ -74,10 +71,7 @@ class MultipleChoiceAnswer(Answer):
     
     @models.permalink
     def get_absolute_url(self):
-        return ('teacher:update_multiplechoiceanswer', (self.question.test.course.id,
-                                                self.question.test.id,
-                                                self.question.id,
-                                                self.id,), {})
+        return ('teacher:update_multiplechoiceanswer', (self.id,), {})
 
 class TakenTest(models.Model):
     user = models.ForeignKey(User)
