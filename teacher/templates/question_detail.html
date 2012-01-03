@@ -1,0 +1,20 @@
+{% extends "base_teacher.html" %}
+
+{% block header %}
+    <ul class="grid_6">
+        <li class="grid_3 alpha"><a href="{% url teacher:course_detail course.id %}"><span class="ui-icon ui-icon-arrowthick-1-w"></span>Back to Course</a></li>
+        <li class="grid_3 omega"><a href="{{ test.get_absolute_url }}"><span class="ui-icon ui-icon-arrowthick-1-w"></span>Back to Test</a></li>
+    </ul>
+{% endblock %}
+
+{% block content %}
+	<p>{{ question }}</p>
+	{% if question.answer_set.all.count %}
+		<p class="underline">Answers:</p>
+		<ul>
+			{% for answer in question.answer_set.all %}
+				<li><a href="{% if question.type == 'multiple_choice' %}{% url teacher:multiplechoiceanswer_detail answer.id %}{% else %}{% url teacher:answer_detail answer.id %}{% endif %}">{{ answer }}</a></li>
+			{% endfor %}
+		</ul>
+	{% endif %}
+{% endblock %}

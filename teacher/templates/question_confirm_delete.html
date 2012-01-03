@@ -1,0 +1,21 @@
+{% extends "base_teacher.html" %}
+
+{% block header %}
+	<ul class="grid_9">
+        <li class="grid_3 alpha"><a href="{% url teacher:course_detail course.id %}"><span class="ui-icon ui-icon-arrowthick-1-w"></span>Back to Course</a></li>
+    	<li class="grid_3"><a href="{% url teacher:test_detail test.id %}"><span class="ui-icon ui-icon-arrowthick-1-w"></span>Back to Test</a></li>
+    	<li class="grid_3 omega"><a href="{{ question.get_absolute_url }}"><span class="ui-icon ui-icon-arrowthick-1-w"></span>Back to Question</a></li>
+	</ul>
+{% endblock %}
+
+{% block content %}
+    <p>Are you sure you want to delete this question?</p>
+    <ul>
+    	<li>{{ question }}</li>
+    </ul>
+    <form action="{% url teacher:delete_question question.id %}" method="POST">
+    	<button>Yes, I'm sure.</button>	
+    	{% csrf_token %}
+    </form>
+{% endblock %}
+

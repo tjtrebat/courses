@@ -1,0 +1,46 @@
+{% extends "base_teacher.html" %}
+
+{% load teacher_extras %}
+
+{% block js %}
+    {% if question %}
+        {{ block.super }}
+        {% do_sortable "teacher:sort_answer" %}
+    {% endif %}
+{% endblock %}
+
+{% block header %}
+    <ul class="grid_6">
+        <li class="grid_3 alpha"><a href="{% url teacher:course_detail course.id %}"><span class="ui-icon ui-icon-arrowthick-1-w"></span>Back to Course</a></li>
+        <li class="grid_3 omega"><a href="{{ test.get_absolute_url }}"><span class="ui-icon ui-icon-arrowthick-1-w"></span>Back to Test</a></li>
+    </ul>
+{% endblock %}
+
+{% block content %}
+    <form action="{% if question %}{{ question.get_absolute_url }}{% else %}{% url teacher:create_question test.id %}{% endif %}" method="POST">
+        {{ form.as_p }}
+        {% csrf_token %}
+        <button type="submit">{% if question %}Update{% else %}Create{% endif %}</button>
+    </form>
+    {% if question %}
+        <p><a href="{% if question.type == 'multiple_choice' %}{% url teacher:create_multiplechoiceanswer question.id %}{% else %}{% url teacher:create_answer question.id %}{% endif %}"><span class="ui-icon ui-icon-plusthick"></span>Add answer</a></p>
+        {% if question.answer_set.all.count %}
+            <p class="underline">Answers:</p>
+            <ul id="sortable">
+				{% for answer in question.answer_set.all %}
+					<li id="answer_{{ answer.id }}"><a href="{% if question.type == 'multiple_choice' %}{% url teacher:update_multiplechoiceanswer answer.id %}{% else %}{{ answer.get_absolute_url }}{% endif %}"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>{{ answer }}</a></li>
+				{% endfor %}
+            </ul>
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
+{% block footer %}
+    <ul class="grid_2">
+        <li class="grid_2 alpha omega">
+            {% if question %}
+                <a class="ui-state-error" href="{% url teacher:delete_question question.id %}"><span class="ui-icon ui-icon-closethick"></span>Delete</a>
+            {% endif %}
+        </li>
+    </ul>
+{% endblock %}
