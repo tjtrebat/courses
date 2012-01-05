@@ -1,10 +1,11 @@
 __author__ = 'Tom'
 
-from teacher.models import *
 from django import forms
 from django.contrib.auth.forms import *
 from django.contrib.auth.models import *
 from django.db.models import Max
+
+from courses.teacher.models import *
 
 class FormattedDateTimeField(forms.DateTimeField):
     widget = forms.DateTimeInput(format="%m/%d/%Y %I%M %p")

@@ -1,7 +1,8 @@
 __author__ = 'Tom'
 
-from teacher.models import *
 from django.contrib import admin
+
+from courses.teacher.models import *
 
 class QuestionAdmin(admin.ModelAdmin):
     list_filter = ("test",)

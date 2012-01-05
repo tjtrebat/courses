@@ -8,7 +8,7 @@ class SortableNode(template.Node):
     def __init__(self, viewname):
         self.viewname = viewname
     def render(self, context):
-        t = template.loader.get_template('_sortable.html')
+        t = template.loader.get_template('teacher/_sortable.html')
         return t.render(Context({'url': reverse(self.viewname)}, autoescape=False))
 
 @register.tag
@@ -26,7 +26,7 @@ class DatetimeNode(template.Node):
     def __init__(self, ids):
         self.ids = ids
     def render(self, context):
-        t = template.loader.get_template('_datetime.html')
+        t = template.loader.get_template('teacher/_datetime.html')
         return t.render(Context({'ids': self.ids}, autoescape=False))
 
 @register.tag
@@ -46,7 +46,7 @@ class TabsNode(template.Node):
     def __init__(self, ids):
         self.ids = ids
     def render(self, context):
-        t = template.loader.get_template('_tabs.html')
+        t = template.loader.get_template('teacher/_tabs.html')
         return t.render(Context({'ids': self.ids}, autoescape=False))
 
 @register.tag

@@ -1,3 +1,7 @@
+body {
+    font: 62.5% "Trebuchet MS", sans-serif;
+}
+
 .errorlist {
     color:#FF0000;
 }

@@ -16,9 +16,7 @@ def user_login(request, template='login.html'):
                 if user.is_active:
                     login(request, user)
                     # Redirect to a success page.
-                    if user.get_profile().is_student():
-                        return HttpResponseRedirect("/tests/")
-                    return HttpResponseRedirect("/courses/")
+                    return HttpResponseRedirect("/")
                 else:
                     # Return a 'disabled account' error message
                     pass

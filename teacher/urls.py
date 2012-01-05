@@ -3,7 +3,7 @@ __author__ = 'Tom'
 from django.conf.urls.defaults import *
 
 urlpatterns = patterns('',
-    url(r'^courses/$', 'teacher.views.course_list', name='course_list'),
+    url(r'^$', 'teacher.views.course_list', name='course_list'),
     url(r'^course/(?P<course_id>\d+)/$', 'teacher.views.course_detail', name='course_detail'),
     url(r'^course/(?P<course_id>\d+)/edit/$', 'teacher.views.update_course', name='update_course'),
     url(r'^course/add/$', 'teacher.views.create_course', name='create_course'),
