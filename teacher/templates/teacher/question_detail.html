@@ -1,0 +1,23 @@
+{% extends "teacher/base.html" %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li class="grid_2">
+        <a href="{% url teacher:course_detail course.id %}">Back to Course</a>
+    </li>
+    <li class="grid_2 omega">
+        <a href="{{ test.get_absolute_url }}">Back to Test</a>
+    </li>
+{% endblock %}
+
+{% block content %}
+	<p>{{ question }}</p>
+	{% if question.answer_set.all.count %}
+		<p class="underline">Answers:</p>
+		<ul>
+			{% for answer in question.answer_set.all %}
+				<li><a href="{% if question.type == 'multiple_choice' %}{% url teacher:multiplechoiceanswer_detail answer.id %}{% else %}{% url teacher:answer_detail answer.id %}{% endif %}">{{ answer }}</a></li>
+			{% endfor %}
+		</ul>
+	{% endif %}
+{% endblock %}

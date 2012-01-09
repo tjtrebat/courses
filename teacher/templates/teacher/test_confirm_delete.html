@@ -1,0 +1,23 @@
+{% extends "teacher/base.html" %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li class="grid_2">
+        <a href="{% url teacher:course_detail course.id %}">Back to Course</a>
+    </li>
+    <li class="grid_2 omega">
+        <a href="{{ test.get_absolute_url }}">Back to Test</a>
+    </li>
+{% endblock %}
+
+{% block content %}
+    <p>Are you sure you want to delete this test?</p>
+    <ul>
+    	<li>{{ test }}</li>
+    </ul>
+    <form action="{% url teacher:delete_test test.id %}" method="POST">
+    	<button>Yes, I'm sure.</button>	
+    	{% csrf_token %}
+    </form>
+{% endblock %}
+

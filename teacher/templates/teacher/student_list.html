@@ -1,0 +1,17 @@
+{% extends "teacher/base.html" %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li class="grid_2 omega">
+        <a href="{{ course.get_absolute_url }}">Back to Course</a>
+    </li>
+{% endblock %}
+
+{% block content %}
+	<ul>
+		{% for student in students %}
+			<li><a href="{% url teacher:update_student student.id %}">{{ student.get_full_name }}</a></li>
+		{% endfor %}
+	</ul>
+    <p><a href="{% url teacher:create_student %}">Add Student</a></p>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "teacher/base.html" %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    <li class="grid_2">
+        <a href="{% url teacher:course_detail course.id %}">Back to Course</a>
+    </li>
+    <li class="grid_2">
+        <a href="{% url teacher:test_detail test.id %}">Back to Test</a>
+    </li>
+    <li class="grid_2 omega">
+        <a href="{{ question.get_absolute_url }}">Back to Question</a>
+    </li>
+{% endblock %}
+
+{% block content %}
+    <p>Are you sure you want to delete this answer?</p>
+    <ul>
+    	<li>{{ answer }}</li>
+    </ul>
+    <form action="{% url teacher:delete_answer answer.id %}" method="POST">
+    	<button>Yes, I'm sure.</button>	
+    	{% csrf_token %}
+    </form>
+{% endblock %}
