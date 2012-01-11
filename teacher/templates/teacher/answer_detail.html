@@ -1,18 +1,5 @@
 {% extends "teacher/base.html" %}
 
-{% block breadcrumbs %}
-    {{ block.super }}
-    <li class="grid_2">
-        <a href="{% url teacher:course_detail course.id %}">Back to Course</a>
-    </li>
-    <li class="grid_2">
-        <a href="{{ test.get_absolute_url }}">Back to Test</a>
-    </li>
-    <li class="grid_2 omega">
-        <a href="{% url teacher:question_detail question.id %}">Back to Question</a>
-    </li>
-{% endblock %}
-
 {% block content %}
 	<p>{{ answer }}</p>
 {% endblock %}

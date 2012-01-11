@@ -9,16 +9,6 @@
     {% endif %}
 {% endblock %}
 
-{% block breadcrumbs %}
-    {{ block.super }}
-    <li class="grid_2">
-        <a href="{% url teacher:course_detail course.id %}">Back to Course</a>
-    </li>
-    <li class="grid_2 omega">
-        <a href="{{ test.get_absolute_url }}">Back to Test</a>
-    </li>
-{% endblock %}
-
 {% block content %}
     <form action="{% if question %}{{ question.get_absolute_url }}{% else %}{% url teacher:create_question test.id %}{% endif %}" method="POST">
         {{ form.as_p }}

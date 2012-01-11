@@ -7,18 +7,6 @@
     {% do_datetime "#id_sent" "#id_expires" %}
 {% endblock %}
 
-{% block breadcrumbs %}
-    {{ block.super }}
-    <li class="grid_1">
-        <a href="{% url teacher:course_detail course.id %}">Back to Course</a>
-    </li>
-    <li class="grid_1 omega">
-        {% if test %}
-            <a href="{% url teacher:test_detail test.id %}">Back to Test</a>
-        {% endif %}
-    </li>
-{% endblock %}
-
 {% block content %}
     <form action="{% if test %}{% url teacher:update_test test.id %}{% else %}{% url teacher:create_test course.id %}{% endif %}" method="POST">
         {{ form.as_p }}

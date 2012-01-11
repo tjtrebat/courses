@@ -75,6 +75,7 @@ def course_list(request, template='teacher/course_list.html'):
 @login_required
 def course_detail(request, course_id, template='teacher/course_detail.html'):
     course = get_object_or_404(request.user.course_set.all(), pk=course_id)
+    request.breadcrumbs(course.name, request.path_info)
     return render_to_response(template, {'course': course},
         context_instance=RequestContext(request))
 
@@ -91,6 +92,7 @@ def update_course(request, course_id, template='teacher/course_form.html'):
             return HttpResponseRedirect(reverse('teacher:course_list'))
     else:
         form = CourseForm(instance=course)
+    request.breadcrumbs(course.name, request.path_info)
     return render_to_response(template, {'course': course,
                                          'form': form},
         context_instance=RequestContext(request))
@@ -104,6 +106,7 @@ def delete_course(request, course_id, template='teacher/course_confirm_delete.ht
               {"verbose_name": Course._meta.verbose_name}
         messages.success(request, msg, fail_silently=True)
         return HttpResponseRedirect(reverse("teacher:course_list"))
+    request.breadcrumbs(course.name, request.path_info)
     return render_to_response(template, {'course': course},
         context_instance=RequestContext(request))
 
@@ -120,6 +123,11 @@ def create_test(request, course_id, template='teacher/test_form.html'):
             return HttpResponseRedirect(reverse("teacher:create_question", args=[form.instance.pk]))
     else:
         form = TestForm(course.pk)
+    request.breadcrumbs([
+        (course.name, course.get_absolute_url()),
+        (_("Add %(verbose_name)s") %\
+         {"verbose_name": Test._meta.verbose_name}, request.path_info),
+    ])
     return render_to_response(template, {'course': course,
                                          'form': form},
         context_instance=RequestContext(request))
@@ -129,6 +137,10 @@ def test_detail(request, test_id, template='teacher/test_detail.html'):
     test = get_object_or_404(Test.objects.select_related(), pk=test_id)
     course = test.course
     if request.user != course.teacher: raise Http404
+    request.breadcrumbs([
+        (course.name, course.get_absolute_url()),
+        (test.name, test.get_absolute_url()),
+    ])
     return render_to_response(template, {'course': course,
                                          'test': test},
         context_instance=RequestContext(request))
@@ -148,6 +160,10 @@ def update_test(request, test_id, template='teacher/test_form.html'):
             return HttpResponseRedirect(course.get_absolute_url())
     else:
         form = TestForm(course.pk, instance=test)
+    request.breadcrumbs([
+        (course.name, course.get_absolute_url()),
+        (test.name, test.get_absolute_url()),
+    ])
     return render_to_response(template, {'course': course,
                                          'test': test,
                                          'form': form},
@@ -164,6 +180,10 @@ def delete_test(request, test_id, template='teacher/test_confirm_delete.html'):
               {"verbose_name": Test._meta.verbose_name}
         messages.success(request, msg, fail_silently=True)
         return HttpResponseRedirect(course.get_absolute_url())
+    request.breadcrumbs([
+        (course.name, course.get_absolute_url()),
+        (test.name, test.get_absolute_url()),
+    ])
     return render_to_response(template, {'course': course,
                                          'test': test},
         context_instance=RequestContext(request))
@@ -180,6 +200,10 @@ def send_test(request, test_id, template='teacher/test_confirm_send.html'):
               {"verbose_name": Test._meta.verbose_name}
         messages.success(request, msg, fail_silently=True)
         return HttpResponseRedirect(course.get_absolute_url())
+    request.breadcrumbs([
+        (course.name, course.get_absolute_url()),
+        (test.name, test.get_absolute_url()),
+    ])
     return render_to_response(template, {'course': course,
                                          'test': test},
         context_instance=RequestContext(request))
@@ -199,6 +223,12 @@ def create_question(request, test_id, template='teacher/question_form.html'):
             return HttpResponseRedirect(test.get_absolute_url())
     else:
         form = QuestionForm(test.pk)
+    request.breadcrumbs([
+        (course.name, course.get_absolute_url()),
+        (test.name, test.get_absolute_url()),
+        (_("Add %(verbose_name)s") %\
+         {"verbose_name": Question._meta.verbose_name}, request.path_info),
+    ])
     return render_to_response(template, {'course': course,
                                          'test': test,
                                          'form': form},
@@ -210,6 +240,11 @@ def question_detail(request, question_id, template='teacher/question_detail.html
     test = question.test
     course = test.course
     if request.user != course.teacher: raise Http404
+    request.breadcrumbs([
+        (course.name, course.get_absolute_url()),
+        (test.name, test.get_absolute_url()),
+        (question.question, question.get_absolute_url()),
+    ])
     return render_to_response(template, {'course': course,
                                          'test': test,
                                          'question': question},
@@ -231,6 +266,11 @@ def update_question(request, question_id, template='teacher/question_form.html')
             return HttpResponseRedirect(test.get_absolute_url())
     else:
         form = QuestionForm(test.pk, instance=question)
+    request.breadcrumbs([
+        (course.name, course.get_absolute_url()),
+        (test.name, test.get_absolute_url()),
+        (question.question, question.get_absolute_url()),
+    ])
     return render_to_response(template, {'course': course,
                                          'test': test,
                                          'question': question,
@@ -249,6 +289,11 @@ def delete_question(request, question_id, template='teacher/question_confirm_del
               {"verbose_name": Question._meta.verbose_name}
         messages.success(request, msg, fail_silently=True)
         return HttpResponseRedirect(test.get_absolute_url())
+    request.breadcrumbs([
+        (course.name, course.get_absolute_url()),
+        (test.name, test.get_absolute_url()),
+        (question.question, question.get_absolute_url()),
+    ])
     return render_to_response(template, {'course': course,
                                          'test': test,
                                          'question': question},
@@ -270,6 +315,13 @@ def create_answer(request, question_id, template='teacher/answer_form.html'):
             return HttpResponseRedirect(question.get_absolute_url())
     else:
         form = AnswerForm(question.pk)
+    request.breadcrumbs([
+        (course.name, course.get_absolute_url()),
+        (test.name, test.get_absolute_url()),
+        (question.question, question.get_absolute_url()),
+        (_("Add %(verbose_name)s") %\
+         {"verbose_name": Answer._meta.verbose_name}, request.path_info),
+    ])
     return render_to_response(template, {'course': course,
                                          'test': test,
                                          'question': question,
@@ -292,6 +344,13 @@ def create_multiplechoiceanswer(request, question_id, template='teacher/multiple
             return HttpResponseRedirect(question.get_absolute_url())
     else:
         form = MultipleChoiceAnswerForm(question.pk)
+    request.breadcrumbs([
+        (course.name, course.get_absolute_url()),
+        (test.name, test.get_absolute_url()),
+        (question.question, question.get_absolute_url()),
+        (_("Add %(verbose_name)s") %\
+         {"verbose_name": MultipleChoiceAnswer._meta.verbose_name}, request.path_info),
+    ])
     return render_to_response(template, {'course': course,
                                          'test': test,
                                          'question': question,
@@ -305,6 +364,12 @@ def answer_detail(request, answer_id, template='teacher/answer_detail.html'):
     test = question.test
     course = test.course
     if request.user != course.teacher: raise Http404
+    request.breadcrumbs([
+        (course.name, course.get_absolute_url()),
+        (test.name, test.get_absolute_url()),
+        (question.question, question.get_absolute_url()),
+        (answer.answer, request.path_info),
+    ])
     return render_to_response(template, {'course': course,
                                          'test': test,
                                          'question': question,
@@ -328,6 +393,12 @@ def update_answer(request, answer_id, template='teacher/answer_form.html'):
             return HttpResponseRedirect(question.get_absolute_url())
     else:
         form = AnswerForm(question.pk, instance=answer)
+    request.breadcrumbs([
+        (course.name, course.get_absolute_url()),
+        (test.name, test.get_absolute_url()),
+        (question.question, question.get_absolute_url()),
+        (answer.answer, request.path_info),
+    ])
     return render_to_response(template, {'course': course,
                                          'test': test,
                                          'question': question,
@@ -348,6 +419,12 @@ def delete_answer(request, answer_id, template='teacher/answer_confirm_delete.ht
               {"verbose_name": Answer._meta.verbose_name}
         messages.success(request, msg, fail_silently=True)
         return HttpResponseRedirect(question.get_absolute_url())
+    request.breadcrumbs([
+        (course.name, course.get_absolute_url()),
+        (test.name, test.get_absolute_url()),
+        (question.question, question.get_absolute_url()),
+        (answer.answer, request.path_info),
+    ])
     return render_to_response(template, {'course': course,
                                          'test': test,
                                          'question': question,
@@ -361,6 +438,12 @@ def multiplechoiceanswer_detail(request, answer_id, template='teacher/multiplech
     test = question.test
     course = test.course
     if request.user != course.teacher: raise Http404
+    request.breadcrumbs([
+        (course.name, course.get_absolute_url()),
+        (test.name, test.get_absolute_url()),
+        (question.question, question.get_absolute_url()),
+        (multiple_choice_answer.answer, request.path_info),
+    ])
     return render_to_response(template, {'course': course,
                                          'test': test,
                                          'question': question,
@@ -386,6 +469,12 @@ def update_multiplechoiceanswer(request, answer_id, template='teacher/multiplech
             return HttpResponseRedirect(question.get_absolute_url())
     else:
         form = MultipleChoiceAnswerForm(question.pk, instance=multiple_choice_answer)
+    request.breadcrumbs([
+        (course.name, course.get_absolute_url()),
+        (test.name, test.get_absolute_url()),
+        (question.question, question.get_absolute_url()),
+        (multiple_choice_answer.answer, request.path_info),
+    ])
     return render_to_response(template, {'course': course,
                                          'test': test,
                                          'question': question,
@@ -406,6 +495,12 @@ def delete_multiplechoiceanswer(request, answer_id, template='teacher/multiplech
               {"verbose_name": Answer._meta.verbose_name}
         messages.success(request, msg, fail_silently=True)
         return HttpResponseRedirect(question.get_absolute_url())
+    request.breadcrumbs([
+        (course.name, course.get_absolute_url()),
+        (test.name, test.get_absolute_url()),
+        (question.question, question.get_absolute_url()),
+        (multiple_choice_answer.answer, request.path_info),
+    ])
     return render_to_response(template, {'course': course,
                                          'test': test,
                                          'question': question,

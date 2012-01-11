@@ -9,13 +9,6 @@
 	{% endif %}
 {% endblock %}
 
-{% block breadcrumbs %}
-    {{ block.super }}
-    <li class="grid_2 omega">
-        <a href="{% url teacher:course_detail course.id %}">Back to Course</a>
-    </li>
-{% endblock %}
-
 {% block content %}
     {% if not test.is_sent %}
 		<ul id="sortable" class="grid_5">
@@ -23,7 +16,7 @@
 				<li id="question_{{ question.id }}"><a href="{{ question.get_absolute_url }}"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>{{ question }}</a></li>
 			{% endfor %}
 		</ul>
-        <p><a href="{% url teacher:create_question test.id %}">Add question</a></p>
+        <p class="grid_7"><a href="{% url teacher:create_question test.id %}">Add question</a></p>
     {% else %}
 		<ul class="grid_5">
 			{% for question in test.question_set.all %}

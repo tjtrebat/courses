@@ -1,18 +1,5 @@
 {% extends "teacher/base.html" %}
 
-{% block breadcrumbs %}
-    {{ block.super }}
-    <li class="grid_2">
-        <a href="{% url teacher:course_detail course.id %}">Back to Course</a>
-    </li>
-    <li class="grid_2">
-        <a href="{% url teacher:test_detail test.id %}">Back to Test</a>
-    </li>
-    <li class="grid_2 omega">
-        <a href="{{ question.get_absolute_url }}">Back to Question</a>
-    </li>
-{% endblock %}
-
 {% block content %}
     <form action="{% if answer %}{{ answer.get_absolute_url }}{% else %}{% url teacher:create_multiplechoiceanswer question.id %}{% endif %}" method="POST">
         {{ form.as_p }}
