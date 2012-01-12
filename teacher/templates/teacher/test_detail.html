@@ -16,7 +16,7 @@
 				<li id="question_{{ question.id }}"><a href="{{ question.get_absolute_url }}"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>{{ question }}</a></li>
 			{% endfor %}
 		</ul>
-        <p class="grid_7"><a href="{% url teacher:create_question test.id %}">Add question</a></p>
+        <p class="grid_7"><a href="{% url teacher:create_question test.id %}">+ Add question</a></p>
     {% else %}
 		<ul class="grid_5">
 			{% for question in test.question_set.all %}

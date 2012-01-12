@@ -18,7 +18,7 @@
 					<li><a href="{% url teacher:course_detail course.id %}">{{ course }}</a></li>
 				{% endfor %}
 			</ul>
-            <p><a href="{% url teacher:create_course %}">Add Course</a></p>
+            <p><a href="{% url teacher:create_course %}">+ Add Course</a></p>
 		</div>
 		<div id="tabs-2">
 			<ul>
@@ -26,7 +26,7 @@
 					<li><a href="{{ student.get_profile.get_absolute_url }}">{{ student.get_full_name }}</a></li>
 				{% endfor %}
 			</ul>
-            <p><a href="{% url teacher:create_student %}">Add Student</a></p>
+            <p><a href="{% url teacher:create_student %}">+ Add Student</a></p>
 		</div>
 	</div>
 {% endblock %}

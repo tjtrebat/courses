@@ -16,7 +16,7 @@
         <button type="submit">{% if question %}Update{% else %}Create{% endif %}</button>
     </form>
     {% if question %}
-        <p><a href="{% if question.type == 'multiple_choice' %}{% url teacher:create_multiplechoiceanswer question.id %}{% else %}{% url teacher:create_answer question.id %}{% endif %}"><span class="ui-icon ui-icon-plusthick"></span>Add answer</a></p>
+        <p><a href="{% if question.type == 'multiple_choice' %}{% url teacher:create_multiplechoiceanswer question.id %}{% else %}{% url teacher:create_answer question.id %}{% endif %}">+ Add answer</a></p>
         {% if question.answer_set.all.count %}
             <p class="underline">Answers:</p>
             <ul id="sortable">
