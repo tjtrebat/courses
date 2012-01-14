@@ -1,19 +1,17 @@
 {% extends "teacher/base.html" %}
 
+{% block actions %}
+    {% if answer %}
+        <li>
+            <a href="{% url teacher:delete_multiplechoiceanswer answer.id %}">Delete</a>
+        </li>
+    {% endif %}
+{% endblock %}
+
 {% block content %}
     <form action="{% if answer %}{{ answer.get_absolute_url }}{% else %}{% url teacher:create_multiplechoiceanswer question.id %}{% endif %}" method="POST">
         {{ form.as_p }}
         {% csrf_token %}
         <button type="submit">{% if answer %}Update{% else %}Create{% endif %}</button>
     </form>
-{% endblock %}
-
-{% block footer %}
-    <ul class="grid_2">
-        <li class="grid_2 alpha omega">
-            {% if answer %}
-                <a class="ui-state-error" href="{% url teacher:delete_multiplechoiceanswer answer.id %}"><span class="ui-icon ui-icon-closethick"></span>Delete</a>
-            {% endif %}
-        </li>
-    </ul>
 {% endblock %}

@@ -6,6 +6,15 @@
     {% do_tabs "#tabs" %}
 {% endblock %}
 
+{% block actions %}
+    <li>
+        <a href="{% url teacher:delete_course course.id %}">Delete</a>
+    </li>
+    <li>
+        <a href="{% url teacher:update_course course.id %}">Edit</a>
+    </li>
+{% endblock %}
+
 {% block content %}
     <div id="tabs">
         <ul>
@@ -32,15 +41,4 @@
             </ul>
         </div>
     </div>
-{% endblock %}
-
-{% block footer %}
-    <ul class="grid_4">
-        <li class="grid_2 alpha">
-            <a class="ui-state-error" href="{% url teacher:delete_course course.id %}"><span class="ui-icon ui-icon-closethick"></span>Delete</a>
-        </li>
-        <li class="grid_2 omega">
-            <a href="{% url teacher:update_course course.id %}"><span class="ui-icon ui-icon-pencil"></span>Edit</a>
-        </li>
-    </ul>
 {% endblock %}

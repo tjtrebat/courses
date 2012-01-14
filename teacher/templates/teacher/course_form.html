@@ -7,20 +7,18 @@
     {% do_datetime "#id_start_date" "#id_end_date" %}
 {% endblock %}
 
+{% block actions %}
+    {% if course %}
+        <li>
+            <a href="{% url teacher:delete_course course.id %}">Delete</a>
+        </li>
+    {% endif %}
+{% endblock %}
+
 {% block content %}
     <form action="{% if course %}{% url teacher:update_course course.id %}{% else %}{% url teacher:create_course %}{% endif %}" method="POST">
         {{ form.as_p }}
         {% csrf_token %}
         <button type="submit">{% if course %}Update{% else %}Create{% endif %}</button>
     </form>
-{% endblock %}
-
-{% block footer %}
-    <ul class="grid_2">
-        <li class="grid_2 alpha omega">
-            {% if course %}
-                <a class="ui-state-error" href="{% url teacher:delete_course course.id %}"><span class="ui-icon ui-icon-closethick"></span>Delete</a>
-            {% endif %}
-        </li>
-    </ul>
 {% endblock %}

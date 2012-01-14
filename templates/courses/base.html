@@ -21,26 +21,29 @@
         <div class="breadcrumbs">
             {% block breadcrumbs %}{% endblock %}
         </div>
-        {% if messages %}
-            <ul id="messages" class="grid_12">
-                {% for message in messages %}
-                    <li class="grid_11">
-                        {% if message.level == 25 %}
-                            <div class="ui-widget">
-                                <div class="ui-state-highlight ui-corner-all">
-                                    <p><span class="ui-icon ui-icon-info"></span>
-                                        <strong>Hey!</strong> {{ message }}</p>
+        <div class="grid_12 alpha omega">
+            {% if messages %}
+                <ul id="messages">
+                    {% for message in messages %}
+                        <li>
+                            {% if message.level == 25 %}
+                                <div class="ui-widget">
+                                    <div class="ui-state-highlight ui-corner-all">
+                                        <p><span class="ui-icon ui-icon-info"></span>
+                                            <strong>Hey!</strong> {{ message }}</p>
+                                    </div>
                                 </div>
-                            </div>
-                        {% endif %}
-                    </li>
-                {% endfor %}
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+            <ul>
+                {% block actions %}{% endblock %}
             </ul>
-        {% endif %}
-        <div class="grid_7">
-        	<div class="grid_6 prefix_1">
-            	{% block content %}{% endblock %}
-            </div>
+            {% block content %}{% endblock %}
+        </div>
+        <div class="grid_12 alpha omega">
             {% block footer %}{% endblock %}
         </div>
     </div>

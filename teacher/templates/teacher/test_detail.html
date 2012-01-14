@@ -9,33 +9,31 @@
 	{% endif %}
 {% endblock %}
 
+{% block actions %}
+    <li>
+        <a href="{% url teacher:delete_test test.id %}">Delete</a>
+    </li>
+    <li>
+        <a href="{% url teacher:update_test test.id %}">Edit</a>
+    </li>
+    <li>
+        <a href="{% url teacher:send_test test.id %}">Send</a>
+    </li>
+{% endblock %}
+
 {% block content %}
     {% if not test.is_sent %}
-		<ul id="sortable" class="grid_5">
+		<ul id="sortable">
 			{% for question in test.question_set.all %}
-				<li id="question_{{ question.id }}"><a href="{{ question.get_absolute_url }}"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>{{ question }}</a></li>
+				<li id="question_{{ question.id }}"><a href="{{ question.get_absolute_url }}">{{ question }}</a></li>
 			{% endfor %}
 		</ul>
-        <p class="grid_7"><a href="{% url teacher:create_question test.id %}">+ Add question</a></p>
+        <p><a href="{% url teacher:create_question test.id %}">+ Add question</a></p>
     {% else %}
-		<ul class="grid_5">
+		<ul>
 			{% for question in test.question_set.all %}
 				<li><a href="{% url teacher:question_detail question.id %}">{{ question }}</a></li>
 			{% endfor %}
 		</ul>    
     {% endif %}
-{% endblock %}
-
-{% block footer %}
-    <ul class="grid_6">
-        <li class="grid_2 alpha">
-            <a class="ui-state-error" href="{% url teacher:delete_test test.id %}"><span class="ui-icon ui-icon-closethick"></span>Delete</a>
-        </li>
-        <li class="grid_2">
-            <a href="{% url teacher:update_test test.id %}"><span class="ui-icon ui-icon-pencil"></span>Edit</a>
-        </li>
-        <li class="grid_2 omega">
-            <a href="{% url teacher:send_test test.id %}"><span class="ui-icon ui-icon-mail-closed"></span>Send</a>
-        </li>
-    </ul>
 {% endblock %}

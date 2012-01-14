@@ -9,6 +9,14 @@
     {% endif %}
 {% endblock %}
 
+{% block actions %}
+    {% if question %}
+        <li>
+            <a href="{% url teacher:delete_question question.id %}">Delete</a>
+        </li>
+    {% endif %}
+{% endblock %}
+
 {% block content %}
     <form action="{% if question %}{{ question.get_absolute_url }}{% else %}{% url teacher:create_question test.id %}{% endif %}" method="POST">
         {{ form.as_p }}
@@ -21,19 +29,9 @@
             <p class="underline">Answers:</p>
             <ul id="sortable">
 				{% for answer in question.answer_set.all %}
-					<li id="answer_{{ answer.id }}"><a href="{% if question.type == 'multiple_choice' %}{% url teacher:update_multiplechoiceanswer answer.id %}{% else %}{{ answer.get_absolute_url }}{% endif %}"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>{{ answer }}</a></li>
+					<li id="answer_{{ answer.id }}"><a href="{% if question.type == 'multiple_choice' %}{% url teacher:update_multiplechoiceanswer answer.id %}{% else %}{{ answer.get_absolute_url }}{% endif %}">{{ answer }}</a></li>
 				{% endfor %}
             </ul>
         {% endif %}
     {% endif %}
-{% endblock %}
-
-{% block footer %}
-    <ul class="grid_2">
-        <li class="grid_2 alpha omega">
-            {% if question %}
-                <a class="ui-state-error" href="{% url teacher:delete_question question.id %}"><span class="ui-icon ui-icon-closethick"></span>Delete</a>
-            {% endif %}
-        </li>
-    </ul>
 {% endblock %}
