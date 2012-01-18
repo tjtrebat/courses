@@ -2,14 +2,19 @@ body {
     font: 62.5% "Trebuchet MS", sans-serif;
 }
 
+ul, li {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
 .errorlist {
     color:#FF0000;
 }
 
 .ui-icon {
-	position:relative;
-	top:4px;
-	right:5px;
+    position:relative;
+    right:5px;
     float:left;
 }
 
@@ -22,6 +27,8 @@ body {
     list-style:none;	
 }
 
-#messages {
-    margin-top: 0;
+#result-list, #result-list li {
+    margin-left: 0;
+    padding-left: 0;
 }
+

@@ -9,11 +9,6 @@
     {% block css %}{% endblock %}
     <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery-1.6.2.min.js"></script>
     <script type="text/javascript" src="{{ MEDIA_URL }}js/jquery-ui-1.8.16.custom.min.js"></script>
-    <script type="text/javascript">
-        $(document).ready(function(){
-            $("button").button();
-        });
-    </script>
     {% block js %}{% endblock %}
 </head>
 <body>
@@ -30,7 +25,7 @@
                                 <div class="ui-widget">
                                     <div class="ui-state-highlight ui-corner-all">
                                         <p><span class="ui-icon ui-icon-info"></span>
-                                            <strong>Hey!</strong> {{ message }}</p>
+                                            {{ message }}</p>
                                     </div>
                                 </div>
                             {% endif %}
@@ -38,9 +33,6 @@
                     {% endfor %}
                 </ul>
             {% endif %}
-            <ul>
-                {% block actions %}{% endblock %}
-            </ul>
             {% block content %}{% endblock %}
         </div>
         <div class="grid_12 alpha omega">

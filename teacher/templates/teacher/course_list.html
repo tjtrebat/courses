@@ -1,32 +1,48 @@
 {% extends "teacher/base.html" %}
 
-{% load teacher_extras %}
-
 {% block js %}
-	{% do_tabs "#tabs" %}
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $("#action-toggle").click(function(){
+                var isChecked = $(this).prop("checked");
+                $("input[name='courses']").each(function(index, obj){
+                    $(obj).prop("checked", (isChecked) ? true : false);
+                });
+            });
+            $("input[name='courses']").click(function(){
+                $("#action-toggle").prop("checked",
+                        (!$("input[name='courses']:not(:checked)").length) ? true : false);
+            });
+        });
+    </script>
 {% endblock %}
 
 {% block content %}
-	<div id="tabs">
-		<ul>
-			<li><a href="#tabs-1">Courses</a></li>
-			<li><a href="#tabs-2">Students</a></li>
-		</ul>
-		<div id="tabs-1">
-			<ul>
-				{% for course in courses %}
-					<li><a href="{% url teacher:course_detail course.id %}">{{ course }}</a></li>
-				{% endfor %}
-			</ul>
-            <p><a href="{% url teacher:create_course %}">+ Add Course</a></p>
-		</div>
-		<div id="tabs-2">
-			<ul>
-				{% for student in students %}
-					<li><a href="{{ student.get_profile.get_absolute_url }}">{{ student.get_full_name }}</a></li>
-				{% endfor %}
-			</ul>
-            <p><a href="{% url teacher:create_student %}">+ Add Student</a></p>
-		</div>
-	</div>
+    <div class="grid_12 alpha omega">
+        <div class="grid_10 alpha">
+            <h3>Select course</h3>
+        </div>
+        <div class="grid_2 omega">
+            <a href="{% url teacher:create_course %}">+ Add Course</a>
+        </div>
+    </div>
+    <div class="grid_12 alpha omega">
+        <form action="{% url teacher:course_list %}" method="POST">
+            <p>{{ form.action.label }}: {{ form.action }} <button type="submit">Go</button></p>
+            <table>
+                <thead>
+                    <tr><th><input type="checkbox" id="action-toggle" /></th><th>Course</th></tr>
+                </thead>
+                <tbody>
+                    {% for choice in form.fields.courses.choices %}
+                        <tr>
+                            <td><input type="checkbox" name="courses" value="{{ choice|first }}" id="id_courses_{{ choice|first }}" /></td>
+                            <td><a href="{% url teacher:course_detail choice|first %}">{{ choice|last }}</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% csrf_token %}
+        </form>
+    </div>
 {% endblock %}

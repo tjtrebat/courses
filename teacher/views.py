@@ -16,7 +16,7 @@ def create_student(request, template='teacher/student_form.html'):
         form = AddStudentForm(request.user, request.POST)
         if form.is_valid():
             form.save()
-            msg = _("The %(verbose_name)s was added.") %\
+            msg = _("The %(verbose_name)s was added successfully.") %\
                   {"verbose_name": User._meta.verbose_name}
             messages.success(request, msg, fail_silently=True)
             return HttpResponseRedirect(reverse('teacher:course_list'))
@@ -33,7 +33,7 @@ def update_student(request, student_id, template='teacher/student_form.html'):
         form = ChangeStudentForm(request.POST, instance=student)
         if form.is_valid():
             form.save()
-            msg = _("The %(verbose_name)s was updated.") %\
+            msg = _("The %(verbose_name)s was updated successfully.") %\
                   {"verbose_name": User._meta.verbose_name}
             messages.success(request, msg, fail_silently=True)
             return HttpResponseRedirect(reverse('teacher:course_list'))
@@ -45,12 +45,21 @@ def update_student(request, student_id, template='teacher/student_form.html'):
 
 @login_required
 @user_passes_test(lambda u: u.get_profile().is_teacher())
+def student_list(request, template='teacher/student_list.html'):
+    students = []
+    for user_profile in UserProfile.objects.filter(teacher=request.user):
+        students.append(user_profile.user)
+    return render_to_response(template, {'students': students},
+        context_instance=RequestContext(request))
+
+@login_required
+@user_passes_test(lambda u: u.get_profile().is_teacher())
 def create_course(request, template='teacher/course_form.html'):
     if request.method == "POST":
         form = CourseForm(request.POST)
         if form.is_valid():
             form.save(request=request)
-            msg = _("The %(verbose_name)s was added.") %\
+            msg = _("The %(verbose_name)s was added successfully.") %\
                   {"verbose_name": Course._meta.verbose_name}
             messages.success(request, msg, fail_silently=True)
             return HttpResponseRedirect(reverse('teacher:course_list'))
@@ -64,12 +73,25 @@ def create_course(request, template='teacher/course_form.html'):
 @login_required
 @user_passes_test(lambda u: u.get_profile().is_teacher())
 def course_list(request, template='teacher/course_list.html'):
-    courses = Course.objects.filter(teacher=request.user)
-    students = []
-    for user_profile in UserProfile.objects.filter(teacher=request.user):
-        students.append(user_profile.user)
-    return render_to_response(template, {'courses': courses,
-                                         'students': students},
+    if request.method == "POST":
+        form = CourseListForm(request.user, request.POST)
+        if form.is_valid():
+            template = 'teacher/courses_confirm_action.html'
+            if request.POST.get("post", "") == "yes":
+                selected_courses = form.cleaned_data['courses']
+                for course_id in selected_courses:
+                    course = get_object_or_404(Course, pk=course_id)
+                    course.delete()
+                    msg = _("Successfully deleted %d %s.") %\
+                          (len(selected_courses), Course._meta.verbose_name
+                          if len(selected_courses) < 2 else Course._meta.verbose_name_plural)
+                    messages.success(request, msg, fail_silently=True)
+                return HttpResponseRedirect(reverse("teacher:course_list"))
+        else:
+            messages.success(request, "No items have been changed.", fail_silently=True)
+    else:
+        form = CourseListForm(request.user)
+    return render_to_response(template, {'form': form},
         context_instance=RequestContext(request))
 
 @login_required
@@ -86,7 +108,7 @@ def update_course(request, course_id, template='teacher/course_form.html'):
         form = CourseForm(request.POST, instance=course)
         if form.is_valid():
             form.save(request=request)
-            msg = _("The %(verbose_name)s was updated.") %\
+            msg = _("The %(verbose_name)s was updated successfully.") %\
                   {"verbose_name": Course._meta.verbose_name}
             messages.success(request, msg, fail_silently=True)
             return HttpResponseRedirect(reverse('teacher:course_list'))
@@ -102,7 +124,7 @@ def delete_course(request, course_id, template='teacher/course_confirm_delete.ht
     course = get_object_or_404(request.user.course_set.all(), pk=course_id)
     if request.method == 'POST':
         course.delete()
-        msg = _("The %(verbose_name)s was deleted.") %\
+        msg = _("The %(verbose_name)s was deleted successfully.") %\
               {"verbose_name": Course._meta.verbose_name}
         messages.success(request, msg, fail_silently=True)
         return HttpResponseRedirect(reverse("teacher:course_list"))
@@ -117,7 +139,7 @@ def create_test(request, course_id, template='teacher/test_form.html'):
         form = TestForm(course.pk, request.POST)
         if form.is_valid():
             form.save()
-            msg = _("The %(verbose_name)s was added.") %\
+            msg = _("The %(verbose_name)s was added successfully.") %\
                   {"verbose_name": Test._meta.verbose_name}
             messages.success(request, msg, fail_silently=True)
             return HttpResponseRedirect(reverse("teacher:create_question", args=[form.instance.pk]))
@@ -154,7 +176,7 @@ def update_test(request, test_id, template='teacher/test_form.html'):
         form = TestForm(course.pk, request.POST, instance=test)
         if form.is_valid():
             form.save()
-            msg = _("The %(verbose_name)s was updated.") %\
+            msg = _("The %(verbose_name)s was updated successfully.") %\
                   {"verbose_name": Test._meta.verbose_name}
             messages.success(request, msg, fail_silently=True)
             return HttpResponseRedirect(course.get_absolute_url())
@@ -176,7 +198,7 @@ def delete_test(request, test_id, template='teacher/test_confirm_delete.html'):
     if request.user != course.teacher: raise Http404
     if request.method == 'POST':
         test.delete()
-        msg = _("The %(verbose_name)s was deleted.") %\
+        msg = _("The %(verbose_name)s was deleted successfully.") %\
               {"verbose_name": Test._meta.verbose_name}
         messages.success(request, msg, fail_silently=True)
         return HttpResponseRedirect(course.get_absolute_url())
@@ -217,7 +239,7 @@ def create_question(request, test_id, template='teacher/question_form.html'):
         form = QuestionForm(test.pk, request.POST)
         if form.is_valid():
             form.save()
-            msg = _("The %(verbose_name)s was added.") %\
+            msg = _("The %(verbose_name)s was added successfully.") %\
                   {"verbose_name": Question._meta.verbose_name}
             messages.success(request, msg, fail_silently=True)
             return HttpResponseRedirect(test.get_absolute_url())
@@ -260,7 +282,7 @@ def update_question(request, question_id, template='teacher/question_form.html')
         form = QuestionForm(test.pk, request.POST, instance=question)
         if form.is_valid():
             form.save()
-            msg = _("The %(verbose_name)s was updated.") %\
+            msg = _("The %(verbose_name)s was updated successfully.") %\
                   {"verbose_name": Question._meta.verbose_name}
             messages.success(request, msg, fail_silently=True)
             return HttpResponseRedirect(test.get_absolute_url())
@@ -285,7 +307,7 @@ def delete_question(request, question_id, template='teacher/question_confirm_del
     if request.user != course.teacher or test.is_sent: raise Http404
     if request.method == 'POST':
         question.delete()
-        msg = _("The %(verbose_name)s was deleted.") %\
+        msg = _("The %(verbose_name)s was deleted successfully.") %\
               {"verbose_name": Question._meta.verbose_name}
         messages.success(request, msg, fail_silently=True)
         return HttpResponseRedirect(test.get_absolute_url())
@@ -309,7 +331,7 @@ def create_answer(request, question_id, template='teacher/answer_form.html'):
         form = AnswerForm(question.pk, request.POST)
         if form.is_valid():
             form.save()
-            msg = _("The %(verbose_name)s was added.") %\
+            msg = _("The %(verbose_name)s was added successfully.") %\
                   {"verbose_name": Answer._meta.verbose_name}
             messages.success(request, msg, fail_silently=True)
             return HttpResponseRedirect(question.get_absolute_url())
@@ -338,7 +360,7 @@ def create_multiplechoiceanswer(request, question_id, template='teacher/multiple
         form = MultipleChoiceAnswerForm(question.pk, request.POST)
         if form.is_valid():
             form.save()
-            msg = _("The %(verbose_name)s was added.") %\
+            msg = _("The %(verbose_name)s was added successfully.") %\
                   {"verbose_name": Answer._meta.verbose_name}
             messages.success(request, msg, fail_silently=True)
             return HttpResponseRedirect(question.get_absolute_url())
@@ -387,7 +409,7 @@ def update_answer(request, answer_id, template='teacher/answer_form.html'):
         form = AnswerForm(question.pk, request.POST, instance=answer)
         if form.is_valid():
             form.save()
-            msg = _("The %(verbose_name)s was updated.") %\
+            msg = _("The %(verbose_name)s was updated successfully.") %\
                   {"verbose_name": Answer._meta.verbose_name}
             messages.success(request, msg, fail_silently=True)
             return HttpResponseRedirect(question.get_absolute_url())
@@ -415,7 +437,7 @@ def delete_answer(request, answer_id, template='teacher/answer_confirm_delete.ht
     if request.user != course.teacher or test.is_sent: raise Http404
     if request.method == 'POST':
         answer.delete()
-        msg = _("The %(verbose_name)s was deleted.") %\
+        msg = _("The %(verbose_name)s was deleted successfully.") %\
               {"verbose_name": Answer._meta.verbose_name}
         messages.success(request, msg, fail_silently=True)
         return HttpResponseRedirect(question.get_absolute_url())
@@ -463,7 +485,7 @@ def update_multiplechoiceanswer(request, answer_id, template='teacher/multiplech
         form = MultipleChoiceAnswerForm(question.pk, request.POST, instance=multiple_choice_answer)
         if form.is_valid():
             form.save()
-            msg = _("The %(verbose_name)s was updated.") %\
+            msg = _("The %(verbose_name)s was updated successfully.") %\
                   {"verbose_name": Answer._meta.verbose_name}
             messages.success(request, msg, fail_silently=True)
             return HttpResponseRedirect(question.get_absolute_url())
@@ -491,7 +513,7 @@ def delete_multiplechoiceanswer(request, answer_id, template='teacher/multiplech
     if request.user != course.teacher or test.is_sent: raise Http404
     if request.method == 'POST':
         multiple_choice_answer.delete()
-        msg = _("The %(verbose_name)s was deleted.") %\
+        msg = _("The %(verbose_name)s was deleted successfully.") %\
               {"verbose_name": Answer._meta.verbose_name}
         messages.success(request, msg, fail_silently=True)
         return HttpResponseRedirect(question.get_absolute_url())
