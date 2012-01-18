@@ -1,44 +1,48 @@
 {% extends "teacher/base.html" %}
 
-{% load teacher_extras %}
-
 {% block js %}
-    {% do_tabs "#tabs" %}
-{% endblock %}
-
-{% block actions %}
-    <li>
-        <a href="{% url teacher:delete_course course.id %}">Delete</a>
-    </li>
-    <li>
-        <a href="{% url teacher:update_course course.id %}">Edit</a>
-    </li>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $("#action-toggle").click(function(){
+                var isChecked = $(this).prop("checked");
+                $("input[name='tests']").each(function(index, obj){
+                    $(obj).prop("checked", (isChecked) ? true : false);
+                });
+            });
+            $("input[name='tests']").click(function(){
+                $("#action-toggle").prop("checked",
+                        (!$("input[name='tests']:not(:checked)").length) ? true : false);
+            });
+        });
+    </script>
 {% endblock %}
 
 {% block content %}
-    <div id="tabs">
-        <ul>
-            <li><a href="#tabs-1">Current Tests</a></li>
-            <li><a href="#tabs-2">Sent Tests</a></li>
-        </ul>
-        <div id="tabs-1">
-            <ul>
-                {% for test in course.test_set.all %}
-                    {% if not test.is_sent %}
-                        <li><a href="{{ test.get_absolute_url }}">{{ test }}</a></li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
-            <p><a href="{% url teacher:create_test course.id %}">+ Add test</a></p>
+    <div class="grid_12 alpha omega">
+        <div class="grid_10 alpha">
+            <h3>Select test</h3>
         </div>
-        <div id="tabs-2">
-            <ul>
-                {% for test in course.test_set.all %}
-                    {% if test.is_sent %}
-                        <li><a href="{{ test.get_absolute_url }}">{{ test }}</a></li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
+        <div class="grid_2 omega">
+            <a href="{% url teacher:create_test course.id %}">+ Add Test</a>
         </div>
+    </div>
+    <div class="grid_12 alpha omega">
+        <form action="{% url teacher:course_detail course.id %}" method="POST">
+            <p>{{ form.action.label }}: {{ form.action }} <button type="submit">Go</button></p>
+            <table>
+                <thead>
+                    <tr><th><input type="checkbox" id="action-toggle" /></th><th>Test</th></tr>
+                </thead>
+                <tbody>
+                    {% for choice in form.fields.tests.choices %}
+                        <tr>
+                            <td><input type="checkbox" name="tests" value="{{ choice|first }}" id="id_tests_{{ choice|first }}" /></td>
+                            <td><a href="{% url teacher:test_detail choice|first %}">{{ choice|last }}</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% csrf_token %}
+        </form>
     </div>
 {% endblock %}

@@ -1,0 +1,20 @@
+{% extends "teacher/base.html" %}
+
+{% block content %}
+    <p>Are you sure you want to delete the selected test?
+        All of the following objects and their related items will be deleted:</p>
+    <ul>
+        {% for choice in form.fields.tests.choices %}
+            <li>Test: {{ choice|last }}</li>
+        {% endfor %}
+    </ul>
+    <form action="{% url teacher:course_detail course.id %}" method="POST">
+        <button type="submit">Yes, I'm sure.</button>
+        {% for choice in form.fields.tests.choices %}
+            <input type="hidden" name="tests" value="{{ choice|first }}" />
+        {% endfor %}
+        <input type="hidden" name="post" value="yes" />
+        <input type="hidden" name="action" value="delete-selected" />
+        {% csrf_token %}
+    </form>
+{% endblock %}

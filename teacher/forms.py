@@ -7,61 +7,35 @@ from django.db.models import Max
 
 from courses.teacher.models import *
 
+class ActionField(forms.CharField):
+    def __init__(self, model, *args, **kwargs):
+        super(ActionField, self).__init__(*args, **kwargs)
+        self.widget = forms.Select(choices=(
+            ("", "---------",),
+            ("delete-selected", "Delete selected %(verbose_name_plural)s" %\
+                                {"verbose_name_plural": unicode(model._meta.verbose_name_plural)}),
+            ))
+
+    def clean(self, value):
+        return value
+
 class CourseListForm(forms.Form):
     def __init__(self, teacher, *args, **kwargs):
         super(CourseListForm, self).__init__(*args, **kwargs)
-        self.fields['action'] = forms.CharField(max_length=150, widget=forms.Select(choices=(
-            ("", "---------",),
-            ("delete-selected", "Delete selected courses",),
-            )))
+        self.fields['action'] = ActionField(Course)
         self.fields['courses'] = CoursesField(teacher, widget=forms.CheckboxSelectMultiple())
 
-class AddStudentForm(UserCreationForm):
+class CourseDetailForm(forms.Form):
     def __init__(self, teacher, *args, **kwargs):
-        super(AddStudentForm, self).__init__(*args, **kwargs)
-        self.fields['courses'] = CoursesField(teacher)
-       
-    def save(self, commit=True, *args, **kwargs):
-        student = super(AddStudentForm, self).save(commit=False, *args, **kwargs)
-        if commit:
-           student.save()
-           student.groups.add(Group.objects.get(name="students"))
-           profile = student.get_profile()
-           profile.teacher = self.fields['courses'].teacher
-           profile.save()
-           for course in self.cleaned_data['courses']:
-               profile.courses.add(course)
-        return student
-
-    class Meta:
-        model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2')
-
-class ChangeStudentForm(UserChangeForm):
-    def __init__(self, *args, **kwargs):
-        super(ChangeStudentForm, self).__init__(*args, **kwargs)
-        self.profile = self.instance.get_profile()
-        self.fields['courses'] = CoursesField(self.profile.teacher,
-                                              initial=[course.pk for course in self.profile.courses.all()])
-
-    def save(self, commit=True, *args, **kwargs):
-        student = super(ChangeStudentForm, self).save(commit=False, *args, **kwargs)
-        if commit:
-           student.save()
-           self.profile.courses.clear()
-           for course in self.cleaned_data['courses']:
-               self.profile.courses.add(course)
-        return student
-
-    class Meta:
-        model = User
-        fields = ('username', 'first_name', 'last_name', 'email')
+        super(CourseDetailForm, self).__init__(*args, **kwargs)
+        self.fields['action'] = ActionField(Test)
+        self.fields['tests'] = TestsField(teacher, widget=forms.CheckboxSelectMultiple())
 
 class CoursesField(forms.MultipleChoiceField):
     def __init__(self, teacher, *args, **kwargs):
         super(CoursesField, self).__init__(*args, **kwargs)
         self.teacher = teacher
-        self.required = False
+        self.required = True
         self.choices = ((course.pk, course.name) for course in self.teacher.course_set.all())
 
     def clean(self, value):
@@ -73,7 +47,25 @@ class CoursesField(forms.MultipleChoiceField):
             else:
                 if course not in self.teacher.course_set.all():
                     raise forms.ValidationError('Course does not exist')
-        return value
+        return super(CoursesField, self).clean(value)
+
+class TestsField(forms.MultipleChoiceField):
+    def __init__(self, teacher, *args, **kwargs):
+        super(TestsField, self).__init__(*args, **kwargs)
+        self.teacher = teacher
+        self.required = True
+        self.choices = ((test.pk, test.name) for test in Test.objects.filter(course__teacher=teacher))
+
+    def clean(self, value):
+        for test_id in value:
+            try:
+                test = Test.objects.get(pk=test_id)
+            except Test.DoesNotExist:
+                raise forms.ValidationError('Test does not exist')
+            else:
+                if test not in Test.objects.filter(course__teacher=self.teacher):
+                    raise forms.ValidationError('Test does not exist')
+        return super(TestsField, self).clean(value)
 
 class CourseForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -146,3 +138,44 @@ class OrderedField(forms.IntegerField):
 
     def clean(self, value):
         return super(OrderedField, self).clean(value)
+
+class AddStudentForm(UserCreationForm):
+    def __init__(self, teacher, *args, **kwargs):
+        super(AddStudentForm, self).__init__(*args, **kwargs)
+        self.fields['courses'] = CoursesField(teacher)
+
+    def save(self, commit=True, *args, **kwargs):
+        student = super(AddStudentForm, self).save(commit=False, *args, **kwargs)
+        if commit:
+            student.save()
+            student.groups.add(Group.objects.get(name="students"))
+            profile = student.get_profile()
+            profile.teacher = self.fields['courses'].teacher
+            profile.save()
+            for course in self.cleaned_data['courses']:
+                profile.courses.add(course)
+        return student
+
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2')
+
+class ChangeStudentForm(UserChangeForm):
+    def __init__(self, *args, **kwargs):
+        super(ChangeStudentForm, self).__init__(*args, **kwargs)
+        self.profile = self.instance.get_profile()
+        self.fields['courses'] = CoursesField(self.profile.teacher,
+            initial=[course.pk for course in self.profile.courses.all()])
+
+    def save(self, commit=True, *args, **kwargs):
+        student = super(ChangeStudentForm, self).save(commit=False, *args, **kwargs)
+        if commit:
+            student.save()
+            self.profile.courses.clear()
+            for course in self.cleaned_data['courses']:
+                self.profile.courses.add(course)
+        return student
+
+    class Meta:
+        model = User
+        fields = ('username', 'first_name', 'last_name', 'email')

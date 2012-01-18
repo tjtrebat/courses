@@ -82,10 +82,10 @@ def course_list(request, template='teacher/course_list.html'):
                 for course_id in selected_courses:
                     course = get_object_or_404(Course, pk=course_id)
                     course.delete()
-                    msg = _("Successfully deleted %d %s.") %\
-                          (len(selected_courses), Course._meta.verbose_name
-                          if len(selected_courses) < 2 else Course._meta.verbose_name_plural)
-                    messages.success(request, msg, fail_silently=True)
+                msg = _("Successfully deleted %d %s.") %\
+                      (len(selected_courses), Course._meta.verbose_name
+                      if len(selected_courses) < 2 else Course._meta.verbose_name_plural)
+                messages.success(request, msg, fail_silently=True)
                 return HttpResponseRedirect(reverse("teacher:course_list"))
         else:
             messages.success(request, "No items have been changed.", fail_silently=True)
@@ -97,8 +97,27 @@ def course_list(request, template='teacher/course_list.html'):
 @login_required
 def course_detail(request, course_id, template='teacher/course_detail.html'):
     course = get_object_or_404(request.user.course_set.all(), pk=course_id)
+    if request.method == "POST":
+        form = CourseDetailForm(request.user, request.POST)
+        if form.is_valid():
+            template = 'teacher/tests_confirm_action.html'
+            if request.POST.get("post", "") == "yes":
+                selected_tests = form.cleaned_data['tests']
+                for test_id in selected_tests:
+                    test = get_object_or_404(Test, pk=test_id)
+                    test.delete()
+                msg = _("Successfully deleted %d %s.") %\
+                      (len(selected_tests), Test._meta.verbose_name
+                      if len(selected_tests) < 2 else Test._meta.verbose_name_plural)
+                messages.success(request, msg, fail_silently=True)
+                return HttpResponseRedirect(reverse("teacher:course_detail", args=[course.pk]))
+        else:
+            messages.success(request, "No items have been changed.", fail_silently=True)
+    else:
+        form = CourseDetailForm(request.user)
     request.breadcrumbs(course.name, request.path_info)
-    return render_to_response(template, {'course': course},
+    return render_to_response(template, {'form': form,
+                                         'course': course},
         context_instance=RequestContext(request))
 
 @login_required

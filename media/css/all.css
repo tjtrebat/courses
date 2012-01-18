@@ -12,17 +12,6 @@ ul, li {
     color:#FF0000;
 }
 
-.ui-icon {
-    position:relative;
-    right:5px;
-    float:left;
-}
-
-.ui-state-highlight {
-    margin-top: 20px;
-    padding: 0 .7em;
-}
-
 #sortable {
     list-style:none;	
 }
