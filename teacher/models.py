@@ -35,9 +35,9 @@ class Test(models.Model):
         return self.name
 
 class Question(models.Model):
-    question = models.TextField()
-    type = models.CharField(max_length=500, choices=(('multiple_choice', 'Multiple Choice'),
-                                     ('essay', 'Essay'), ('fill_blank', 'Fill Blank')))
+    type = models.CharField(max_length=50, choices=(('multiple_choice', 'Multiple Choice'),
+                                                     ('essay', 'Essay'), ('fill_blank', 'Fill Blank')))
+    question = models.CharField(max_length=5000)
     test = models.ForeignKey('Test')
     ordering = models.IntegerField()
 

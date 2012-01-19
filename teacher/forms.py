@@ -104,11 +104,10 @@ class FormattedDateTimeField(forms.DateTimeField):
         self.input_formats = ('%m/%d/%Y %I:%M %p',)
 
 class QuestionForm(forms.ModelForm):
-    def __init__(self, test_id, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(QuestionForm, self).__init__(*args, **kwargs)
-        self.fields['test'].initial = test_id
         self.fields['test'].widget = forms.HiddenInput()
-        self.fields['ordering'] = OrderedField(Question.objects.filter(test=test_id))
+        self.fields['ordering'].widget.attrs = {'size': 1}
 
     class Meta:
         model = Question

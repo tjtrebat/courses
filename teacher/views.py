@@ -4,6 +4,7 @@ from django.shortcuts import *
 from django.contrib import messages
 from django.contrib.auth.decorators import *
 from django.core.urlresolvers import reverse
+from django.forms.formsets import formset_factory
 from django.utils.translation import ugettext as _
 
 from courses.teacher.forms import *
@@ -178,11 +179,23 @@ def test_detail(request, test_id, template='teacher/test_detail.html'):
     test = get_object_or_404(Test.objects.select_related(), pk=test_id)
     course = test.course
     if request.user != course.teacher: raise Http404
+    QuestionFormSet = formset_factory(QuestionForm, extra=0)
+    if request.method == "POST":
+        formset = QuestionFormSet(request.POST)
+        if formset.is_valid():
+            for form in formset:
+                form.save()
+    else:
+        #initial_data = []
+        #for i in range(6):
+        #    initial_data.append({"test": test.pk, "ordering": i + 1})
+        #formset = QuestionFormSet(initial=initial_data, prefix='questions')
+        formset = QuestionFormSet(initial=[{"test": test.pk}] * 7)
     request.breadcrumbs([
         (course.name, course.get_absolute_url()),
         (test.name, test.get_absolute_url()),
     ])
-    return render_to_response(template, {'course': course,
+    return render_to_response(template, {'formset': formset,
                                          'test': test},
         context_instance=RequestContext(request))
 

@@ -1,39 +1,22 @@
 {% extends "teacher/base.html" %}
 
-{% load teacher_extras %}
-
-{% block js %}
-    {% if not test.is_sent %}
-        {{ block.super }}
-        {% do_sortable "teacher:sort_question" %}
-	{% endif %}
-{% endblock %}
-
-{% block actions %}
-    <li>
-        <a href="{% url teacher:delete_test test.id %}">Delete</a>
-    </li>
-    <li>
-        <a href="{% url teacher:update_test test.id %}">Edit</a>
-    </li>
-    <li>
-        <a href="{% url teacher:send_test test.id %}">Send</a>
-    </li>
-{% endblock %}
-
 {% block content %}
-    {% if not test.is_sent %}
-		<ul id="sortable">
-			{% for question in test.question_set.all %}
-				<li id="question_{{ question.id }}"><a href="{{ question.get_absolute_url }}">{{ question }}</a></li>
-			{% endfor %}
-		</ul>
-        <p><a href="{% url teacher:create_question test.id %}">+ Add question</a></p>
-    {% else %}
-		<ul>
-			{% for question in test.question_set.all %}
-				<li><a href="{% url teacher:question_detail question.id %}">{{ question }}</a></li>
-			{% endfor %}
-		</ul>    
-    {% endif %}
+    <div class="grid_12 alpha omega">
+        <h3>Add questions</h3>
+    </div>
+    <div class="grid_12 alpha omega">
+        <form action="" method="POST">
+            {% for form in formset %}
+                <fieldset>
+                    <legend>Question #{{ forloop.counter }}</legend>
+                    <ul>
+                        {{ form.as_ul }}
+                    </ul>
+                </fieldset><br />
+            {% endfor %}
+            {{ formset.management_form }}
+            <p><button type="submit">Create</button></p>
+            {% csrf_token %}
+        </form>
+    </div>
 {% endblock %}
